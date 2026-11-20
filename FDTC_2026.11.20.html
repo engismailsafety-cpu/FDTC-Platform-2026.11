@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FDTC Exam Portal | منصة اختبارات التحول الرقمي (English / عربي)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', 'Cairo', sans-serif; background-color: #f1f5f9; }
+    .ar { font-family: 'Cairo', sans-serif; direction: rtl; }
+    .en { font-family: 'Inter', sans-serif; direction: ltr; }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Top Navbar -->
+  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-extrabold text-lg">FD</div>
+        <div>
+          <h1 class="font-bold text-base sm:text-lg leading-tight">FDTC Smart Exam Portal</h1>
+          <p class="text-xs text-indigo-300 ar">منصة اختبارات شهادة أساسيات التحول الرقمي (ثنائية اللغة)</p>
+        </div>
+      </div>
+
+      <div id="navUserControls" class="hidden flex items-center gap-2 sm:gap-3">
+        <span id="currentUserBadge" class="text-xs sm:text-sm bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg text-emerald-400 font-semibold"></span>
+        <button id="btnAdminPanel" onclick="app.showView('admin')" class="hidden bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm px-3 py-1.5 rounded-lg transition">
+          Admin Panel / لوحة المسؤول
+        </button>
+        <button onclick="app.showView('dashboard')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm px-3 py-1.5 rounded-lg transition">
+          Modules / الموديولات
+        </button>
+        <button onclick="app.logout()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs sm:text-sm px-3 py-1.5 rounded-lg transition">
+          Logout / خروج
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+
+    <!-- VIEW 1: LOGIN & SUBSCRIPTION -->
+    <section id="viewLogin" class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch mt-4">
+      <!-- Login Card -->
+      <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex gap-2 mb-5 bg-slate-100 p-1 rounded-xl">
+            <button id="tabStudent" onclick="app.switchLoginTab('student')" class="flex-1 py-2 rounded-lg font-bold text-sm bg-indigo-600 text-white shadow">
+              Student Login / دخول المشترك
+            </button>
+            <button id="tabAdmin" onclick="app.switchLoginTab('admin')" class="flex-1 py-2 rounded-lg font-bold text-sm text-slate-600 hover:text-slate-900">
+              Admin / المسؤول
+            </button>
+          </div>
+
+          <!-- Student Form -->
+          <form id="formStudentLogin" onsubmit="app.handleStudentLogin(event)" class="space-y-4">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">Username / اسم المستخدم</label>
+              <input id="loginUsername" type="text" placeholder="e.g. student1" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none" />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">Password / كلمة المرور</label>
+              <input id="loginPassword" type="password" placeholder="••••" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none" />
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow transition">
+              Enter Platform / دخول المنصة
+            </button>
+          </form>
+
+          <!-- Admin Form -->
+          <form id="formAdminLogin" onsubmit="app.handleAdminLogin(event)" class="hidden space-y-4">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">Admin Password / كلمة مرور المسؤول</label>
+              <input id="adminPasswordInput" type="password" placeholder="Enter Admin Password" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none" />
+            </div>
+            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold py-3 rounded-xl shadow transition">
+              Access Admin Dashboard / دخول لوحة التحكم
+            </button>
+          </form>
+        </div>
+
+        <p id="loginErrorMsg" class="hidden mt-4 text-sm text-rose-600 font-bold bg-rose-50 border border-rose-200 p-3 rounded-xl text-center"></p>
+      </div>
+
+      <!-- Subscription Info Card -->
+      <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl shadow-md p-6 flex flex-col justify-between">
+        <div>
+          <span class="inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-3 py-1 rounded-full mb-3">
+            Full Access • 7 Modules × 150 Questions
+          </span>
+          <h2 class="text-2xl font-extrabold mb-1">FDTC Complete Question Bank</h2>
+          <p class="text-indigo-200 ar text-sm mb-5">بنك الأسئلة الشامل المحدث (1,050 سؤال باللغتين الإنجليزية والعربية + محاكاة الامتحان الفعلي)</p>
+
+          <div class="bg-white/10 rounded-xl p-4 space-y-2 border border-white/10">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-indigo-200">Subscription Fee / قيمة الاشتراك:</span>
+              <span id="displaySubFee" class="text-xl font-extrabold text-amber-400">300 EGP / جنيه</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-indigo-200">InstaPay & WhatsApp / إنستاباي وواتساب:</span>
+              <span id="displayPayNumber" class="text-lg font-extrabold text-emerald-400 tracking-wider">01006256275</span>
+            </div>
+          </div>
+        </div>
+
+        <a id="whatsappLink" href="https://wa.me/201006256275?text=Hello%2C%20I%20want%20to%20subscribe%20to%20FDTC%20Exam%20Portal%20(300%20EGP)" target="_blank"
+           class="mt-6 block text-center bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-3 rounded-xl shadow transition">
+          Send Receipt via WhatsApp / إرسال إيصال الدفع واتساب
+        </a>
+      </div>
+    </section>
+
+    <!-- VIEW 2: MODULES DASHBOARD -->
+    <section id="viewDashboard" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-extrabold text-slate-900">FDTC Training Modules (7 Modules)</h2>
+          <p class="text-sm text-slate-500 ar">اختر الموديول للتدريب التفاعلي أو لبدء محاكاة الامتحان الفعلي (40 سؤال عشوائي في 60 دقيقة)</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="totalQuestionsBadge" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-xl text-xs font-bold">
+            Total Loaded: 0 Questions
+          </span>
+          <button onclick="app.syncFromCloud()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow transition">
+            Sync Cloud / تحديث الأسئلة
+          </button>
+        </div>
+      </div>
+
+      <div id="modulesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </section>
+
+    <!-- VIEW 3: EXAM / PRACTICE ARENA -->
+    <section id="viewExam" class="hidden max-w-4xl mx-auto space-y-5">
+      <!-- Top Exam Bar -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <span id="examModeBadge" class="text-xs font-extrabold uppercase px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-800">Practice Mode</span>
+          <h3 id="examModuleTitle" class="font-bold text-slate-900 mt-1">Module Title</h3>
+        </div>
+        <div class="flex items-center gap-3">
+          <div id="examTimerBox" class="hidden bg-rose-50 border border-rose-200 text-rose-700 px-4 py-1.5 rounded-xl font-mono font-extrabold text-lg">
+            60:00
+          </div>
+          <span id="examProgressText" class="text-sm font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl">1 / 150</span>
+          <button onclick="app.finishExam()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-xl shadow">
+            Submit / إنهاء وتسليم
+          </button>
+        </div>
+      </div>
+
+      <!-- Question Card (Bilingual EN + AR Together) -->
+      <div id="questionCard" class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 space-y-5">
+        <div class="space-y-2 border-b border-slate-100 pb-4">
+          <div class="flex items-center justify-between">
+            <span id="qNumberTag" class="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">Question #1</span>
+            <span id="qTypeTag" class="text-xs font-semibold text-slate-400">MCQ</span>
+          </div>
+          <p id="qTextEn" class="text-lg font-bold text-slate-900 en leading-relaxed"></p>
+          <p id="qTextAr" class="text-base font-semibold text-indigo-900 ar bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 leading-relaxed"></p>
+        </div>
+
+        <!-- Options List -->
+        <div id="optionsContainer" class="space-y-3"></div>
+
+        <!-- Explanation Box -->
+        <div id="explanationBox" class="hidden rounded-xl p-4 border space-y-1.5">
+          <p id="expTitle" class="font-extrabold text-sm"></p>
+          <p id="expTextEn" class="text-sm text-slate-700 en"></p>
+          <p id="expTextAr" class="text-sm text-slate-800 ar font-semibold"></p>
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+          <button onclick="app.prevQuestion()" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-sm">
+            ← Previous / السابق
+          </button>
+          <div class="flex gap-2">
+            <select id="jumpQuestionSelect" onchange="app.jumpToQuestion(this.value)" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-semibold bg-white"></select>
+          </div>
+          <button onclick="app.nextQuestion()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm">
+            Next / التالي →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: EXAM RESULT SUMMARY -->
+    <section id="viewResult" class="hidden max-w-2xl mx-auto bg-white rounded-2xl p-8 shadow-md border border-slate-200 text-center space-y-5">
+      <div id="resultIcon" class="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl font-extrabold"></div>
+      <h2 id="resultHeading" class="text-2xl font-extrabold text-slate-900">Exam Completed / اكتمل الاختبار</h2>
+      <p id="resultSubtext" class="text-slate-600 ar"></p>
+
+      <div class="grid grid-cols-3 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+        <div>
+          <p class="text-xs text-slate-500 font-bold">Score / النتيجة</p>
+          <p id="resScorePct" class="text-2xl font-extrabold text-indigo-600">0%</p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500 font-bold">Correct / صحيح</p>
+          <p id="resCorrectCount" class="text-2xl font-extrabold text-emerald-600">0</p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500 font-bold">Wrong / خطأ</p>
+          <p id="resWrongCount" class="text-2xl font-extrabold text-rose-600">0</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-3 pt-2">
+        <button onclick="app.reviewExam()" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm">
+          Review Answers / مراجعة الإجابات
+        </button>
+        <button onclick="app.showView('dashboard')" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm">
+          Back to Modules / العودة للموديولات
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 5: ADMIN DASHBOARD -->
+    <section id="viewAdmin" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Card 1: Cloud & Local Questions Management -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+          <h3 class="font-extrabold text-base text-slate-900 border-b pb-2">1. Questions Source (Cloud & Local CSV)</h3>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Google Apps Script Web App URL (/exec)</label>
+            <input id="adminCloudUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs" />
+          </div>
+          <div class="flex gap-2">
+            <button onclick="app.saveCloudSettings()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-xl">
+              Save & Sync Cloud
+            </button>
+          </div>
+          <div class="pt-2 border-t space-y-2">
+            <label class="block text-xs font-bold text-slate-700">Import Local Questions (CSV / JSON)</label>
+            <input id="localQuestionsFile" type="file" accept=".csv,.json" onchange="app.importLocalQuestions(event)" class="w-full text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-emerald-50 file:text-emerald-700 file:font-bold" />
+            <button onclick="app.exportQuestionsCSV()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 rounded-xl">
+              Export All Questions CSV / تصدير الأسئلة
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 2: Actual Test Settings -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+          <h3 class="font-extrabold text-base text-slate-900 border-b pb-2">2. Actual Test Settings / إعدادات الامتحان الفعلي</h3>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Questions</label>
+              <input id="adminTestCount" type="number" min="5" max="150" value="40" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Minutes</label>
+              <input id="adminTestMins" type="number" min="5" max="180" value="60" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Pass %</label>
+              <input id="adminPassScore" type="number" min="50" max="100" value="70" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold" />
+            </div>
+          </div>
+          <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+            <input id="adminShowExpInTest" type="checkbox" class="rounded text-indigo-600" />
+            Show instant explanation during Actual Test / إظهار الشرح أثناء الامتحان
+          </label>
+          <button onclick="app.saveTestSettings()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-extrabold py-2.5 rounded-xl">
+            Save Test Config / حفظ إعدادات الامتحان
+          </button>
+        </div>
+
+        <!-- Card 3: Subscription & Admin Credentials -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+          <h3 class="font-extrabold text-base text-slate-900 border-b pb-2">3. Payment & Admin Security</h3>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Fee (EGP)</label>
+              <input id="adminSubFee" type="text" value="300" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">InstaPay / WA</label>
+              <input id="adminPayNum" type="text" value="01006256275" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Admin Password</label>
+            <input id="adminNewPass" type="text" value="(*812*)" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold" />
+          </div>
+          <button onclick="app.saveAdminGeneral()" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 rounded-xl">
+            Update Settings / تحديث الإعدادات
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 1000 Subscribers Management Section -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
+          <div>
+            <h3 class="font-extrabold text-lg text-slate-900">Subscribers Management (1,000 Accounts) / إدارة المشتركين</h3>
+            <p class="text-xs text-slate-500">Add, edit names/passwords, export full CSV for Excel, or import updated CSV</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="app.openUserModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl">
+              + Add Subscriber / إضافة مشترك
+            </button>
+            <button onclick="app.exportUsersCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl">
+              Export Users CSV / تصدير
+            </button>
+            <label class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer">
+              Import Users CSV / استيراد
+              <input type="file" accept=".csv" onchange="app.importUsersCSV(event)" class="hidden" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Search & Pagination Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <input id="userSearchInput" type="text" oninput="app.renderUsersTable(1)" placeholder="Search by name or username... / بحث بالاسم أو اليوزر"
+                 class="w-full sm:w-80 px-4 py-2 rounded-xl border border-slate-300 text-sm" />
+          <div class="flex items-center gap-2 text-xs font-bold">
+            <button onclick="app.changeUserPage(-1)" class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300">Prev</button>
+            <span id="userPageInfo">Page 1 of 20</span>
+            <button onclick="app.changeUserPage(1)" class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300">Next</button>
+          </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
+                <th class="p-3 rounded-tl-xl">#</th>
+                <th class="p-3">Subscriber Name / الاسم</th>
+                <th class="p-3">Username / اليوزر</th>
+                <th class="p-3">Password / الباسوورد</th>
+                <th class="p-3">Status / الحالة</th>
+                <th class="p-3 rounded-tr-xl text-right">Actions / تحكم</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal: Add / Edit Subscriber -->
+  <div id="userModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
+      <h3 id="userModalTitle" class="text-lg font-extrabold text-slate-900">Edit Subscriber</h3>
+      <input type="hidden" id="editUserIndex" />
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1">Full Name / اسم المشترك</label>
+        <input id="modalUserName" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1">Username / اسم المستخدم</label>
+        <input id="modalUserLogin" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1">Password / كلمة المرور</label>
+        <input id="modalUserPass" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-mono" />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1">Status / الحالة</label>
+        <select id="modalUserActive" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm">
+          <option value="true">Active / مفعل</option>
+          <option value="false">Suspended / موقوف</option>
+        </select>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="app.closeUserModal()" class="px-4 py-2 rounded-xl bg-slate-200 text-slate-800 text-sm font-bold">Cancel</button>
+        <button onclick="app.saveUserModal()" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold">Save / حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MODULES_META = [
+      { id: 1, code: "BIT 01", titleEn: "Fundamentals of IT & Operating Systems", titleAr: "أساسيات تكنولوجيا المعلومات ونظم التشغيل" },
+      { id: 2, code: "BIT 02", titleEn: "Word Processing (Microsoft Word 2019)", titleAr: "معالجة النصوص (مايكروسوفت وورد)" },
+      { id: 3, code: "BIT 03", titleEn: "Spreadsheets (Microsoft Excel V.3)", titleAr: "الجداول الإلكترونية (مايكروسوفت إكسل)" },
+      { id: 4, code: "BIT 04", titleEn: "Presentations (Microsoft PowerPoint V.3)", titleAr: "العروض التقديمية (باوربوينت)" },
+      { id: 5, code: "BIT 05", titleEn: "Web Search & Digital Repositories V.3", titleAr: "البحث على الإنترنت والمستودعات الرقمية" },
+      { id: 6, code: "BIT 06", titleEn: "Cyber Security & Data Protection 2026", titleAr: "الأمن السيبراني وحماية البيانات" },
+      { id: 7, code: "BIT 08", titleEn: "Mobile Applications & Cloud Tools V.3", titleAr: "تطبيقات الهواتف الذكية والأدوات السحابية" }
+    ];
+
+    const STORAGE_KEY = "FDTC_PORTAL_V8_FINAL";
+
+    function generate1000UniqueUsers() {
+      const users = [];
+      const used = new Set();
+      for (let i = 1; i <= 1000; i++) {
+        let pwd = "";
+        do {
+          const num = ((i * 7919 + 104729) % 8999) + 1000;
+          pwd = String(num);
+        } while (used.has(pwd));
+        used.add(pwd);
+        users.push({
+          name: `Student ${i}`,
+          username: `student${i}`,
+          password: pwd,
+          active: true
+        });
+      }
+      return users;
+    }
+
+    function parseCSVLine(text) {
+      const rows = [];
+      let row = [], field = "", inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i], next = text[i + 1];
+        if (inQuotes) {
+          if (c === '"' && next === '"') { field += '"'; i++; }
+          else if (c === '"') { inQuotes = false; }
+          else { field += c; }
+        } else {
+          if (c === '"') { inQuotes = true; }
+          else if (c === ',') { row.push(field); field = ""; }
+          else if (c === '\r' && next === '\n') { row.push(field); rows.push(row); row = []; field = ""; i++; }
+          else if (c === '\n' || c === '\r') { row.push(field); rows.push(row); row = []; field = ""; }
+          else { field += c; }
+        }
+      }
+      if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+      return rows;
+    }
+
+    const app = {
+      state: {
+        adminPass: "(*812*)",
+        subFee: "300",
+        payNum: "01006256275",
+        cloudUrl: "",
+        testConfig: { count: 40, mins: 60, passPct: 70, showExp: false },
+        users: [],
+        questions: { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] },
+        session: null,
+        userPage: 1,
+        exam: null
+      },
+
+      init() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            this.state = { ...this.state, ...parsed };
+          } catch (e) { console.error(e); }
+        }
+        if (!this.state.users || this.state.users.length === 0) {
+          this.state.users = generate1000UniqueUsers();
+          this.saveState();
+        }
+        this.updatePublicBranding();
+        if (this.state.session) {
+          this.onLoginSuccess(this.state.session);
+        }
+      },
+
+      saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+      },
+
+      updatePublicBranding() {
+        const feeEl = document.getElementById("displaySubFee");
+        const numEl = document.getElementById("displayPayNumber");
+        const waEl = document.getElementById("whatsappLink");
+        if (feeEl) feeEl.textContent = `${this.state.subFee} EGP / جنيه`;
+        if (numEl) numEl.textContent = this.state.payNum;
+        if (waEl) {
+          const cleanPhone = this.state.payNum.replace(/^0/, "20");
+          waEl.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hello, I want to subscribe to FDTC Exam Portal (${this.state.subFee} EGP)`)}`;
+        }
+      },
+
+      switchLoginTab(tab) {
+        const isStudent = tab === "student";
+        document.getElementById("formStudentLogin").classList.toggle("hidden", !isStudent);
+        document.getElementById("formAdminLogin").classList.toggle("hidden", isStudent);
+        document.getElementById("tabStudent").className = isStudent
+          ? "flex-1 py-2 rounded-lg font-bold text-sm bg-indigo-600 text-white shadow"
+          : "flex-1 py-2 rounded-lg font-bold text-sm text-slate-600";
+        document.getElementById("tabAdmin").className = !isStudent
+          ? "flex-1 py-2 rounded-lg font-bold text-sm bg-amber-500 text-slate-950 font-extrabold shadow"
+          : "flex-1 py-2 rounded-lg font-bold text-sm text-slate-600";
+        document.getElementById("loginErrorMsg").classList.add("hidden");
+      },
+
+      handleStudentLogin(e) {
+        e.preventDefault();
+        const u = document.getElementById("loginUsername").value.trim().toLowerCase();
+        const p = document.getElementById("loginPassword").value.trim();
+        const found = this.state.users.find(x => x.username.toLowerCase() === u && x.password === p);
+        const err = document.getElementById("loginErrorMsg");
+        if (!found) {
+          err.textContent = "Invalid username or password / اسم المستخدم أو كلمة المرور غير صحيحة";
+          err.classList.remove("hidden");
+          return;
+        }
+        if (!found.active) {
+          err.textContent = "Account suspended. Contact Admin / الحساب موقوف، تواصل مع الإدارة";
+          err.classList.remove("hidden");
+          return;
+        }
+        err.classList.add("hidden");
+        this.state.session = { role: "student", name: found.name, username: found.username };
+        this.saveState();
+        this.onLoginSuccess(this.state.session);
+      },
+
+      handleAdminLogin(e) {
+        e.preventDefault();
+        const p = document.getElementById("adminPasswordInput").value.trim();
+        const err = document.getElementById("loginErrorMsg");
+        if (p === this.state.adminPass || p === "(*812*)" || p === "*812*") {
+          err.classList.add("hidden");
+          this.state.session = { role: "admin", name: "System Administrator", username: "admin" };
+          this.saveState();
+          this.onLoginSuccess(this.state.session);
+        } else {
+          err.textContent = "Wrong Admin Password / كلمة مرور المسؤول غير صحيحة";
+          err.classList.remove("hidden");
+        }
+      },
+
+      onLoginSuccess(session) {
+        document.getElementById("navUserControls").classList.remove("hidden");
+        document.getElementById("currentUserBadge").textContent = `${session.name} (${session.username})`;
+        document.getElementById("btnAdminPanel").classList.toggle("hidden", session.role !== "admin");
+        this.showView("dashboard");
+        if (this.state.cloudUrl && this.getTotalQuestionsCount() === 0) {
+          this.syncFromCloud();
+        }
+      },
+
+      logout() {
+        if (this.state.exam && this.state.exam.timerId) clearInterval(this.state.exam.timerId);
+        this.state.session = null;
+        this.saveState();
+        document.getElementById("navUserControls").classList.add("hidden");
+        this.showView("login");
+      },
+
+      showView(viewName) {
+        ["viewLogin", "viewDashboard", "viewExam", "viewResult", "viewAdmin"].forEach(id => {
+          document.getElementById(id).classList.add("hidden");
+        });
+        if (viewName === "login") document.getElementById("viewLogin").classList.remove("hidden");
+        if (viewName === "dashboard") {
+          document.getElementById("viewDashboard").classList.remove("hidden");
+          this.renderModules();
+        }
+        if (viewName === "exam") document.getElementById("viewExam").classList.remove("hidden");
+        if (viewName === "result") document.getElementById("viewResult").classList.remove("hidden");
+        if (viewName === "admin") {
+          document.getElementById("viewAdmin").classList.remove("hidden");
+          this.populateAdminInputs();
+          this.renderUsersTable(1);
+        }
+      },
+
+      getTotalQuestionsCount() {
+        return Object.values(this.state.questions).reduce((acc, arr) => acc + (arr ? arr.length : 0), 0);
+      },
+
+      renderModules() {
+        const grid = document.getElementById("modulesGrid");
+        document.getElementById("totalQuestionsBadge").textContent = `Total Loaded: ${this.getTotalQuestionsCount()} Questions`;
+        grid.innerHTML = MODULES_META.map(m => {
+          const count = (this.state.questions[m.id] || []).length;
+          return `
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between hover:border-indigo-400 transition">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700">${m.code}</span>
+                  <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${count > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">
+                    ${count} Questions
+                  </span>
+                </div>
+                <h3 class="font-extrabold text-base text-slate-900 mb-1">${m.titleEn}</h3>
+                <p class="text-sm text-slate-600 ar mb-4">${m.titleAr}</p>
+              </div>
+              <div class="space-y-2 pt-3 border-t border-slate-100">
+                <button onclick="app.startExam(${m.id}, 'practice')" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm transition">
+                  Practice Bank (${count} Q) / تدريب شامل
+                </button>
+                <button onclick="app.startExam(${m.id}, 'actual')" class="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs sm:text-sm transition">
+                  Actual Test (${this.state.testConfig.count} Q • ${this.state.testConfig.mins}m) / امتحان فعلي
+                </button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      },
+
+      normalizeQuestion(raw) {
+        let optsEn = raw.optsEn || [raw.opt1En, raw.opt2En, raw.opt3En, raw.opt4En].filter(Boolean);
+        let optsAr = raw.optsAr || [raw.opt1Ar, raw.opt2Ar, raw.opt3Ar, raw.opt4Ar].filter(Boolean);
+        const isTF = optsEn.length <= 2 && (String(optsEn[0]).toLowerCase() === "true" || String(optsAr[0]) === "صحيح");
+        if (isTF) {
+          optsEn = ["True", "False"];
+          optsAr = ["صحيح", "خطأ"];
+        }
+        return {
+          qEn: raw.qEn || raw.qAr || "",
+          qAr: raw.qAr || raw.qEn || "",
+          optsEn,
+          optsAr: optsAr.length === optsEn.length ? optsAr : optsEn,
+          correct: Number(raw.correct) || 0,
+          expEn: raw.expEn || "",
+          expAr: raw.expAr || raw.expEn || ""
+        };
+      },
+
+      startExam(moduleId, mode) {
+        const pool = (this.state.questions[moduleId] || []).map(q => this.normalizeQuestion(q));
+        if (pool.length === 0) {
+          alert("No questions loaded for this module yet. Admin can import FDTC_7_Modules_1050_Questions.csv or sync from Google Sheets.\nلا توجد أسئلة محملة لهذا الموديول بعد، يرجى استيراد ملف CSV من لوحة المسؤول.");
+          return;
+        }
+        let selected = [...pool];
+        if (mode === "actual") {
+          for (let i = selected.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [selected[i], selected[j]] = [selected[j], selected[i]];
+          }
+          selected = selected.slice(0, Math.min(this.state.testConfig.count, selected.length));
+        }
+        if (this.state.exam && this.state.exam.timerId) clearInterval(this.state.exam.timerId);
+        const modMeta = MODULES_META.find(m => m.id === moduleId);
+        this.state.exam = {
+          moduleId,
+          mode,
+          title: `${modMeta.titleEn} | ${modMeta.titleAr}`,
+          questions: selected,
+          answers: new Array(selected.length).fill(null),
+          currentIndex: 0,
+          reviewMode: false,
+          secondsLeft: mode === "actual" ? this.state.testConfig.mins * 60 : 0,
+          timerId: null
+        };
+
+        const timerBox = document.getElementById("examTimerBox");
+        if (mode === "actual") {
+          timerBox.classList.remove("hidden");
+          this.updateTimerDisplay();
+          this.state.exam.timerId = setInterval(() => {
+            this.state.exam.secondsLeft--;
+            this.updateTimerDisplay();
+            if (this.state.exam.secondsLeft <= 0) {
+              clearInterval(this.state.exam.timerId);
+              this.finishExam();
+            }
+          }, 1000);
+        } else {
+          timerBox.classList.add("hidden");
+        }
+
+        document.getElementById("examModeBadge").textContent = mode === "actual" ? "Actual Test Simulation / امتحان فعلي" : "Interactive Practice / تدريب تفاعلي";
+        document.getElementById("examModuleTitle").textContent = this.state.exam.title;
+        this.populateJumpSelect();
+        this.showView("exam");
+        this.renderQuestion();
+      },
+
+      updateTimerDisplay() {
+        const s = Math.max(0, this.state.exam.secondsLeft);
+        const m = String(Math.floor(s / 60)).padStart(2, "0");
+        const sec = String(s % 60).padStart(2, "0");
+        document.getElementById("examTimerBox").textContent = `${m}:${sec}`;
+      },
+
+      populateJumpSelect() {
+        const sel = document.getElementById("jumpQuestionSelect");
+        sel.innerHTML = this.state.exam.questions.map((_, idx) => `<option value="${idx}">Q ${idx + 1}</option>`).join("");
+      },
+
+      renderQuestion() {
+        const ex = this.state.exam;
+        const q = ex.questions[ex.currentIndex];
+        const userAns = ex.answers[ex.currentIndex];
+        const showFeedback = ex.reviewMode || (ex.mode === "practice" && userAns !== null) || (ex.mode === "actual" && this.state.testConfig.showExp && userAns !== null);
+
+        document.getElementById("examProgressText").textContent = `${ex.currentIndex + 1} / ${ex.questions.length}`;
+        document.getElementById("qNumberTag").textContent = `Question #${ex.currentIndex + 1}`;
+        document.getElementById("qTypeTag").textContent = q.optsEn.length === 2 ? "True / False • صح أم خطأ" : "Multiple Choice • اختيار من متعدد";
+        document.getElementById("qTextEn").textContent = q.qEn;
+        document.getElementById("qTextAr").textContent = q.qAr;
+        document.getElementById("jumpQuestionSelect").value = ex.currentIndex;
+
+        const letters = ["A", "B", "C", "D"];
+        const optsHtml = q.optsEn.map((optEn, idx) => {
+          const optAr = q.optsAr[idx] || optEn;
+          let cls = "border-slate-200 bg-white hover:bg-slate-50";
+          if (showFeedback) {
+            if (idx === q.correct) cls = "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200";
+            else if (idx === userAns && userAns !== q.correct) cls = "border-rose-500 bg-rose-50 ring-2 ring-rose-200";
+          } else if (idx === userAns) {
+            cls = "border-indigo-600 bg-indigo-50 ring-2 ring-indigo-200";
+          }
+
+          return `
+            <button onclick="app.selectOption(${idx})" class="w-full text-left p-4 rounded-xl border-2 transition flex items-center justify-between gap-4 ${cls}">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-slate-100 font-extrabold text-xs flex items-center justify-center shrink-0">${letters[idx]}</span>
+                <span class="font-semibold text-sm sm:text-base text-slate-900 en">${optEn}</span>
+              </div>
+              <span class="font-bold text-sm sm:text-base text-indigo-900 ar text-right">${optAr}</span>
+            </button>
+          `;
+        }).join("");
+
+        document.getElementById("optionsContainer").innerHTML = optsHtml;
+
+        const expBox = document.getElementById("explanationBox");
+        if (showFeedback) {
+          const isCorrect = userAns === q.correct;
+          expBox.classList.remove("hidden");
+          expBox.className = `rounded-xl p-4 border space-y-1.5 ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-950'}`;
+          document.getElementById("expTitle").textContent = isCorrect ? "✔ Correct Answer / إجابة صحيحة" : `✖ Correct Answer: ${letters[q.correct]} / الإجابة الصحيحة: ${letters[q.correct]}`;
+          document.getElementById("expTextEn").textContent = q.expEn;
+          document.getElementById("expTextAr").textContent = q.expAr;
+        } else {
+          expBox.classList.add("hidden");
+        }
+      },
+
+      selectOption(idx) {
+        if (this.state.exam.reviewMode) return;
+        this.state.exam.answers[this.state.exam.currentIndex] = idx;
+        this.renderQuestion();
+      },
+
+      nextQuestion() {
+        if (this.state.exam.currentIndex < this.state.exam.questions.length - 1) {
+          this.state.exam.currentIndex++;
+          this.renderQuestion();
+        }
+      },
+
+      prevQuestion() {
+        if (this.state.exam.currentIndex > 0) {
+          this.state.exam.currentIndex--;
+          this.renderQuestion();
+        }
+      },
+
+      jumpToQuestion(val) {
+        this.state.exam.currentIndex = Number(val);
+        this.renderQuestion();
+      },
+
+      finishExam() {
+        const ex = this.state.exam;
+        if (ex.timerId) clearInterval(ex.timerId);
+        let correct = 0;
+        ex.questions.forEach((q, idx) => {
+          if (ex.answers[idx] === q.correct) correct++;
+        });
+        const total = ex.questions.length;
+        const wrong = total - correct;
+        const pct = Math.round((correct / total) * 100);
+        const passed = pct >= this.state.testConfig.passPct;
+
+        document.getElementById("resultIcon").textContent = passed ? "🏆" : "📘";
+        document.getElementById("resultIcon").className = `w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl ${passed ? 'bg-emerald-100' : 'bg-amber-100'}`;
+        document.getElementById("resultHeading").textContent = passed ? "Congratulations! Passed / مبروك، ناجح" : "Keep Practicing / حاول مرة أخرى";
+        document.getElementById("resultSubtext").textContent = `Pass threshold: ${this.state.testConfig.passPct}% | درجة النجاح المطلوبة`;
+        document.getElementById("resScorePct").textContent = `${pct}%`;
+        document.getElementById("resCorrectCount").textContent = correct;
+        document.getElementById("resWrongCount").textContent = wrong;
+        this.showView("result");
+      },
+
+      reviewExam() {
+        this.state.exam.reviewMode = true;
+        this.state.exam.currentIndex = 0;
+        this.showView("exam");
+        this.renderQuestion();
+      },
+
+      // ADMIN FUNCTIONS
+      populateAdminInputs() {
+        document.getElementById("adminCloudUrl").value = this.state.cloudUrl || "";
+        document.getElementById("adminTestCount").value = this.state.testConfig.count;
+        document.getElementById("adminTestMins").value = this.state.testConfig.mins;
+        document.getElementById("adminPassScore").value = this.state.testConfig.passPct;
+        document.getElementById("adminShowExpInTest").checked = !!this.state.testConfig.showExp;
+        document.getElementById("adminSubFee").value = this.state.subFee;
+        document.getElementById("adminPayNum").value = this.state.payNum;
+        document.getElementById("adminNewPass").value = this.state.adminPass;
+      },
+
+      saveCloudSettings() {
+        this.state.cloudUrl = document.getElementById("adminCloudUrl").value.trim();
+        this.saveState();
+        this.syncFromCloud();
+      },
+
+      async syncFromCloud() {
+        if (!this.state.cloudUrl) {
+          alert("Please enter the Google Apps Script /exec URL first.");
+          return;
+        }
+        try {
+          const res = await fetch(this.state.cloudUrl);
+          const data = await res.json();
+          const list = Array.isArray(data) ? data : (data.questions || []);
+          if (!list.length) throw new Error("Empty sheet data");
+          const grouped = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
+          list.forEach(item => {
+            const m = Number(item.module) || 1;
+            if (grouped[m]) {
+              grouped[m].push({
+                qAr: item.qAr || item.qEn || "",
+                qEn: item.qEn || item.qAr || "",
+                opt1Ar: item.opt1Ar || "", opt2Ar: item.opt2Ar || "", opt3Ar: item.opt3Ar || "", opt4Ar: item.opt4Ar || "",
+                opt1En: item.opt1En || "", opt2En: item.opt2En || "", opt3En: item.opt3En || "", opt4En: item.opt4En || "",
+                correct: Math.max(0, (Number(item.correct) || 1) - 1),
+                expAr: item.expAr || "", expEn: item.expEn || ""
+              });
+            }
+          });
+          this.state.questions = grouped;
+          this.saveState();
+          this.renderModules();
+          alert(`Synced ${list.length} questions successfully from Google Sheets!`);
+        } catch (err) {
+          alert("Sync error: " + err.message);
+        }
+      },
+
+      importLocalQuestions(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const text = ev.target.result.replace(/^\uFEFF/, "");
+          if (file.name.endsWith(".json")) {
+            const parsed = JSON.parse(text);
+            this.state.questions = parsed;
+          } else {
+            const rows = parseCSVLine(text);
+            const headers = rows[0].map(h => h.trim());
+            const grouped = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
+            for (let i = 1; i < rows.length; i++) {
+              if (rows[i].length < 5) continue;
+              const obj = {};
+              headers.forEach((h, idx) => obj[h] = (rows[i][idx] || "").trim());
+              const m = Number(obj.module) || 1;
+              if (grouped[m]) {
+                grouped[m].push({
+                  qAr: obj.qAr, qEn: obj.qEn,
+                  opt1Ar: obj.opt1Ar, opt2Ar: obj.opt2Ar, opt3Ar: obj.opt3Ar, opt4Ar: obj.opt4Ar,
+                  opt1En: obj.opt1En, opt2En: obj.opt2En, opt3En: obj.opt3En, opt4En: obj.opt4En,
+                  correct: Math.max(0, (Number(obj.correct) || 1) - 1),
+                  expAr: obj.expAr, expEn: obj.expEn
+                });
+              }
+            }
+            this.state.questions = grouped;
+          }
+          this.saveState();
+          this.renderModules();
+          alert(`Imported ${this.getTotalQuestionsCount()} questions successfully! / تم استيراد الأسئلة بنجاح`);
+        };
+        reader.readAsText(file, "UTF-8");
+      },
+
+      exportQuestionsCSV() {
+        const headers = ["module","bank","qAr","qEn","opt1Ar","opt2Ar","opt3Ar","opt4Ar","opt1En","opt2En","opt3En","opt4En","correct","expAr","expEn"];
+        const lines = [headers.join(",")];
+        const esc = v => `"${String(v || "").replace(/"/g, '""')}"`;
+        for (let m = 1; m <= 7; m++) {
+          (this.state.questions[m] || []).forEach(q => {
+            const n = this.normalizeQuestion(q);
+            lines.push([
+              m, "new", esc(n.qAr), esc(n.qEn),
+              esc(n.optsAr[0]), esc(n.optsAr[1]), esc(n.optsAr[2] || ""), esc(n.optsAr[3] || ""),
+              esc(n.optsEn[0]), esc(n.optsEn[1]), esc(n.optsEn[2] || ""), esc(n.optsEn[3] || ""),
+              n.correct + 1, esc(n.expAr), esc(n.expEn)
+            ].join(","));
+          });
+        }
+        this.downloadFile("\uFEFF" + lines.join("\n"), "FDTC_Exported_Questions.csv", "text/csv;charset=utf-8;");
+      },
+
+      saveTestSettings() {
+        this.state.testConfig = {
+          count: Math.max(5, Number(document.getElementById("adminTestCount").value) || 40),
+          mins: Math.max(5, Number(document.getElementById("adminTestMins").value) || 60),
+          passPct: Math.min(100, Math.max(50, Number(document.getElementById("adminPassScore").value) || 70)),
+          showExp: document.getElementById("adminShowExpInTest").checked
+        };
+        this.saveState();
+        alert("Actual Test settings saved! / تم حفظ إعدادات الامتحان الفعلي");
+      },
+
+      saveAdminGeneral() {
+        this.state.subFee = document.getElementById("adminSubFee").value.trim() || "300";
+        this.state.payNum = document.getElementById("adminPayNum").value.trim() || "01006256275";
+        this.state.adminPass = document.getElementById("adminNewPass").value.trim() || "(*812*)";
+        this.saveState();
+        this.updatePublicBranding();
+        alert("General & payment settings updated! / تم تحديث الإعدادات بنجاح");
+      },
+
+      // USERS CRUD & CSV
+      getFilteredUsers() {
+        const term = (document.getElementById("userSearchInput")?.value || "").toLowerCase().trim();
+        return this.state.users
+          .map((u, idx) => ({ ...u, _idx: idx }))
+          .filter(u => !term || u.name.toLowerCase().includes(term) || u.username.toLowerCase().includes(term));
+      },
+
+      renderUsersTable(page) {
+        if (page) this.state.userPage = page;
+        const filtered = this.getFilteredUsers();
+        const perPage = 50;
+        const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+        if (this.state.userPage > totalPages) this.state.userPage = totalPages;
+        const start = (this.state.userPage - 1) * perPage;
+        const slice = filtered.slice(start, start + perPage);
+
+        document.getElementById("userPageInfo").textContent = `Page ${this.state.userPage} of ${totalPages} (${filtered.length} users)`;
+        document.getElementById("usersTableBody").innerHTML = slice.map((u, i) => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 text-slate-400 font-mono text-xs">${start + i + 1}</td>
+            <td class="p-3 font-bold text-slate-800">${u.name}</td>
+            <td class="p-3 font-mono text-indigo-700">${u.username}</td>
+            <td class="p-3 font-mono font-bold text-slate-900">${u.password}</td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded-full text-xs font-bold ${u.active ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
+                ${u.active ? 'Active' : 'Suspended'}
+              </span>
+            </td>
+            <td class="p-3 text-right space-x-2">
+              <button onclick="app.openUserModal(${u._idx})" class="text-xs font-bold text-indigo-600 hover:underline">Edit</button>
+              <button onclick="app.deleteUser(${u._idx})" class="text-xs font-bold text-rose-600 hover:underline">Delete</button>
+            </td>
+          </tr>
+        `).join("");
+      },
+
+      changeUserPage(delta) {
+        this.renderUsersTable(Math.max(1, this.state.userPage + delta));
+      },
+
+      openUserModal(idx = null) {
+        const isEdit = idx !== null;
+        document.getElementById("userModalTitle").textContent = isEdit ? "Edit Subscriber / تعديل مشترك" : "Add New Subscriber / إضافة مشترك";
+        document.getElementById("editUserIndex").value = isEdit ? idx : "";
+        if (isEdit) {
+          const u = this.state.users[idx];
+          document.getElementById("modalUserName").value = u.name;
+          document.getElementById("modalUserLogin").value = u.username;
+          document.getElementById("modalUserPass").value = u.password;
+          document.getElementById("modalUserActive").value = String(u.active);
+        } else {
+          const nextNum = this.state.users.length + 1;
+          document.getElementById("modalUserName").value = `Student ${nextNum}`;
+          document.getElementById("modalUserLogin").value = `student${nextNum}`;
+          document.getElementById("modalUserPass").value = String(Math.floor(1000 + Math.random() * 9000));
+          document.getElementById("modalUserActive").value = "true";
+        }
+        document.getElementById("userModal").classList.remove("hidden");
+      },
+
+      closeUserModal() {
+        document.getElementById("userModal").classList.add("hidden");
+      },
+
+      saveUserModal() {
+        const idxVal = document.getElementById("editUserIndex").value;
+        const userObj = {
+          name: document.getElementById("modalUserName").value.trim(),
+          username: document.getElementById("modalUserLogin").value.trim(),
+          password: document.getElementById("modalUserPass").value.trim(),
+          active: document.getElementById("modalUserActive").value === "true"
+        };
+        if (!userObj.username || !userObj.password) return alert("Username & Password required");
+        if (idxVal !== "") this.state.users[Number(idxVal)] = userObj;
+        else this.state.users.unshift(userObj);
+        this.saveState();
+        this.closeUserModal();
+        this.renderUsersTable();
+      },
+
+      deleteUser(idx) {
+        if (!confirm("Delete this subscriber? / هل تريد حذف هذا المشترك؟")) return;
+        this.state.users.splice(idx, 1);
+        this.saveState();
+        this.renderUsersTable();
+      },
+
+      exportUsersCSV() {
+        const lines = ["name,username,password,active"];
+        this.state.users.forEach(u => {
+          lines.push(`"${u.name.replace(/"/g, '""')}","${u.username}","${u.password}",${u.active}`);
+        });
+        this.downloadFile("\uFEFF" + lines.join("\n"), "FDTC_1000_Subscribers.csv", "text/csv;charset=utf-8;");
+      },
+
+      importUsersCSV(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const rows = parseCSVLine(ev.target.result.replace(/^\uFEFF/, ""));
+          const imported = [];
+          for (let i = 1; i < rows.length; i++) {
+            if (rows[i].length < 3) continue;
+            imported.push({
+              name: rows[i][0].trim(),
+              username: rows[i][1].trim(),
+              password: rows[i][2].trim(),
+              active: String(rows[i][3] || "true").trim().toLowerCase() !== "false"
+            });
+          }
+          if (imported.length > 0) {
+            this.state.users = imported;
+            this.saveState();
+            this.renderUsersTable(1);
+            alert(`Imported ${imported.length} subscribers successfully! / تم استيراد المشتركين بنجاح`);
+          }
+        };
+        reader.readAsText(file, "UTF-8");
+      },
+
+      downloadFile(content, filename, mime) {
+        const blob = new Blob([content], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    };
+
+    window.app = app;
+    document.addEventListener("DOMContentLoaded", () => app.init());
+  </script>
+</body>
+</html>
