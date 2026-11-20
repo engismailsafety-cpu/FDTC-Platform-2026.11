@@ -529,23 +529,35 @@
         exam: null
       },
 
-      init() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            this.state = { ...this.state, ...parsed, testConfig: { ...this.state.testConfig, ...(parsed.testConfig || {}) } };
-          } catch (e) { console.error(e); }
-        }
-        if (!this.state.users || this.state.users.length === 0) {
-          this.state.users = generate1000UniqueUsers();
-          this.saveState();
-        }
-        this.updatePublicBranding();
-        if (this.state.session && this.state.session.role !== "guest_trial") {
-          this.onLoginSuccess(this.state.session);
-        }
-      },
+      async init() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      this.state = {
+        ...this.state,
+        ...parsed,
+        // الحفاظ على الرابط الافتراضي المثبت في الكود إذا لم يكن محفوظاً
+        cloudUrl: parsed.cloudUrl || this.state.cloudUrl,
+        testConfig: { ...this.state.testConfig, ...(parsed.testConfig || {}) }
+      };
+    } catch (e) { console.error(e); }
+  }
+  if (!this.state.users || this.state.users.length === 0) {
+    this.state.users = generate1000UniqueUsers();
+    this.saveState();
+  }
+  this.updatePublicBranding();
+
+  // مزامنة تلقائية لكل الزوار والمشتركين من أي جهاز فور فتح الرابط
+  if (this.state.cloudUrl) {
+    await this.syncFromCloud(true);
+  }
+
+  if (this.state.session && this.state.session.role !== "guest_trial") {
+    this.onLoginSuccess(this.state.session);
+  }
+},
 
       saveState() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
