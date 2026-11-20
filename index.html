@@ -123,7 +123,7 @@
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 class="text-xl font-extrabold text-slate-900">FDTC Training Modules (7 Modules)</h2>
-          <p class="text-sm text-slate-500 ar">اختر الموديول للتدريب التفاعلي أو لبدء محاكاة الامتحان الفعلي (40 سؤال عشوائي في 60 دقيقة)</p>
+          <p class="text-sm text-slate-500 ar">اختر الموديول للتدريب العشوائي أو لبدء محاكاة الامتحان الفعلي (40 سؤال عشوائي في 60 دقيقة)</p>
         </div>
         <div class="flex items-center gap-3">
           <span id="totalQuestionsBadge" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-xl text-xs font-bold">
@@ -455,7 +455,16 @@
       }
     ];
 
-    const STORAGE_KEY = "FDTC_PORTAL_V11_FETCH_JSONP";
+    const STORAGE_KEY = "FDTC_PORTAL_V12_RANDOM_ALL";
+
+    function shuffleArray(list) {
+      const arr = [...list];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
 
     function generate1000UniqueUsers() {
       const users = [];
@@ -520,7 +529,7 @@
         adminPass: "(*812*)",
         subFee: "300",
         payNum: "01006256275",
-        cloudUrl: "https://script.google.com/macros/s/AKfycbz4W7xr_RzHy7iH2yPR_fcFT30AT84zd1WbjZw1MH86vJBbxGpPPXWXVZks_1zb4IROOQ/exec",
+        cloudUrl: "",
         testConfig: { count: 40, mins: 60, passPct: 70, showExp: false, trialEnabled: true, trialCount: 5 },
         users: [],
         questions: { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] },
@@ -529,35 +538,28 @@
         exam: null
       },
 
-      async init() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      this.state = {
-        ...this.state,
-        ...parsed,
-        // الحفاظ على الرابط الافتراضي المثبت في الكود إذا لم يكن محفوظاً
-        cloudUrl: parsed.cloudUrl || this.state.cloudUrl,
-        testConfig: { ...this.state.testConfig, ...(parsed.testConfig || {}) }
-      };
-    } catch (e) { console.error(e); }
-  }
-  if (!this.state.users || this.state.users.length === 0) {
-    this.state.users = generate1000UniqueUsers();
-    this.saveState();
-  }
-  this.updatePublicBranding();
-
-  // مزامنة تلقائية لكل الزوار والمشتركين من أي جهاز فور فتح الرابط
-  if (this.state.cloudUrl) {
-    await this.syncFromCloud(true);
-  }
-
-  if (this.state.session && this.state.session.role !== "guest_trial") {
-    this.onLoginSuccess(this.state.session);
-  }
-},
+      init() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            this.state = {
+              ...this.state,
+              ...parsed,
+              cloudUrl: parsed.cloudUrl || this.state.cloudUrl,
+              testConfig: { ...this.state.testConfig, ...(parsed.testConfig || {}) }
+            };
+          } catch (e) { console.error(e); }
+        }
+        if (!this.state.users || this.state.users.length === 0) {
+          this.state.users = generate1000UniqueUsers();
+          this.saveState();
+        }
+        this.updatePublicBranding();
+        if (this.state.session && this.state.session.role !== "guest_trial") {
+          this.onLoginSuccess(this.state.session);
+        }
+      },
 
       saveState() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
@@ -707,7 +709,7 @@
               </div>
               <div class="space-y-2 pt-3 border-t border-slate-100">
                 <button onclick="app.startExam(${m.id}, 'practice')" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm transition">
-                  Practice Bank (${count} Q) / تدريب شامل
+                  Random Practice (${count} Q) / تدريب عشوائي
                 </button>
                 <button onclick="app.startExam(${m.id}, 'actual')" class="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs sm:text-sm transition">
                   Actual Test (${this.state.testConfig.count} Q • ${this.state.testConfig.mins}m) / امتحان فعلي
@@ -747,18 +749,16 @@
 
         if (mode === "trial") {
           const limit = this.state.testConfig.trialCount || 5;
-          pool = (pool.length >= limit ? pool : SAMPLE_TRIAL_QUESTIONS).slice(0, limit);
+          const trialSource = pool.length > 0 ? pool : SAMPLE_TRIAL_QUESTIONS;
+          pool = shuffleArray(trialSource).slice(0, Math.min(limit, trialSource.length));
         } else if (pool.length === 0) {
           alert("No questions loaded for this module yet. Admin can import FDTC_7_Modules_1050_Questions.csv or sync from Google Sheets.\nلا توجد أسئلة محملة لهذا الموديول بعد، يرجى استيراد ملف CSV من لوحة المسؤول.");
           return;
         }
 
-        let selected = [...pool];
+        // Randomize question order across all modes (practice, actual, and trial)
+        let selected = shuffleArray(pool);
         if (mode === "actual") {
-          for (let i = selected.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [selected[i], selected[j]] = [selected[j], selected[i]];
-          }
           selected = selected.slice(0, Math.min(this.state.testConfig.count, selected.length));
         }
 
@@ -792,8 +792,8 @@
         }
 
         const badgeText = mode === "actual"
-          ? "Actual Test Simulation / امتحان فعلي"
-          : (mode === "trial" ? `Free Trial (${selected.length} Q) / تجربة مجانية` : "Interactive Practice / تدريب تفاعلي");
+          ? "Random Actual Test / امتحان فعلي عشوائي"
+          : (mode === "trial" ? `Random Free Trial (${selected.length} Q) / تجربة عشوائية` : "Random Practice / تدريب عشوائي");
         document.getElementById("examModeBadge").textContent = badgeText;
         document.getElementById("examModuleTitle").textContent = this.state.exam.title;
         this.populateJumpSelect();
@@ -1028,7 +1028,6 @@
             list = extractQuestionsArray(parsed);
           } catch (_) {
             clearTimeout(timeoutId);
-            // Fallback automatically to JSONP when fetch throws Failed to fetch / CORS
             const jsonpData = await this.syncViaJSONP(url, 12000);
             list = extractQuestionsArray(jsonpData);
           }
