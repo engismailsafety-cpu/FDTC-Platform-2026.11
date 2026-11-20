@@ -45,7 +45,6 @@
 
     <!-- VIEW 1: LOGIN & SUBSCRIPTION -->
     <section id="viewLogin" class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch mt-4">
-      <!-- Login Card -->
       <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 flex flex-col justify-between">
         <div>
           <div class="flex gap-2 mb-5 bg-slate-100 p-1 rounded-xl">
@@ -57,7 +56,6 @@
             </button>
           </div>
 
-          <!-- Student Form -->
           <form id="formStudentLogin" onsubmit="app.handleStudentLogin(event)" class="space-y-4">
             <div>
               <label class="block text-sm font-bold text-slate-700 mb-1">Username / اسم المستخدم</label>
@@ -72,7 +70,13 @@
             </button>
           </form>
 
-          <!-- Admin Form -->
+          <div id="freeTrialBanner" class="mt-4 pt-4 border-t border-slate-100 text-center">
+            <p class="text-xs text-slate-500 ar mb-2">عايز تجرب المنصة الأول؟ ابدأ بـ 5 أسئلة مجانية قبل الاشتراك</p>
+            <button type="button" onclick="app.startGuestTrial()" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold py-2.5 rounded-xl text-xs sm:text-sm transition">
+              🎁 Free Trial (5 Questions) / تجربة مجانية (5 أسئلة)
+            </button>
+          </div>
+
           <form id="formAdminLogin" onsubmit="app.handleAdminLogin(event)" class="hidden space-y-4">
             <div>
               <label class="block text-sm font-bold text-slate-700 mb-1">Admin Password / كلمة مرور المسؤول</label>
@@ -87,8 +91,7 @@
         <p id="loginErrorMsg" class="hidden mt-4 text-sm text-rose-600 font-bold bg-rose-50 border border-rose-200 p-3 rounded-xl text-center"></p>
       </div>
 
-      <!-- Subscription Info Card -->
-      <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl shadow-md p-6 flex flex-col justify-between">
+      <div id="subscriptionCard" class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl shadow-md p-6 flex flex-col justify-between">
         <div>
           <span class="inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-3 py-1 rounded-full mb-3">
             Full Access • 7 Modules × 150 Questions
@@ -126,7 +129,7 @@
           <span id="totalQuestionsBadge" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-xl text-xs font-bold">
             Total Loaded: 0 Questions
           </span>
-          <button onclick="app.syncFromCloud()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow transition">
+          <button id="btnSyncCloud" onclick="app.syncFromCloud()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow transition">
             Sync Cloud / تحديث الأسئلة
           </button>
         </div>
@@ -137,7 +140,6 @@
 
     <!-- VIEW 3: EXAM / PRACTICE ARENA -->
     <section id="viewExam" class="hidden max-w-4xl mx-auto space-y-5">
-      <!-- Top Exam Bar -->
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
         <div>
           <span id="examModeBadge" class="text-xs font-extrabold uppercase px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-800">Practice Mode</span>
@@ -154,7 +156,6 @@
         </div>
       </div>
 
-      <!-- Question Card (Bilingual EN + AR Together) -->
       <div id="questionCard" class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 space-y-5">
         <div class="space-y-2 border-b border-slate-100 pb-4">
           <div class="flex items-center justify-between">
@@ -165,17 +166,14 @@
           <p id="qTextAr" class="text-base font-semibold text-indigo-900 ar bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 leading-relaxed"></p>
         </div>
 
-        <!-- Options List -->
         <div id="optionsContainer" class="space-y-3"></div>
 
-        <!-- Explanation Box -->
         <div id="explanationBox" class="hidden rounded-xl p-4 border space-y-1.5">
           <p id="expTitle" class="font-extrabold text-sm"></p>
           <p id="expTextEn" class="text-sm text-slate-700 en"></p>
           <p id="expTextAr" class="text-sm text-slate-800 ar font-semibold"></p>
         </div>
 
-        <!-- Navigation Controls -->
         <div class="flex items-center justify-between pt-3 border-t border-slate-100">
           <button onclick="app.prevQuestion()" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-sm">
             ← Previous / السابق
@@ -190,7 +188,7 @@
       </div>
     </section>
 
-    <!-- VIEW 4: EXAM RESULT SUMMARY -->
+    <!-- VIEW 4: EXAM RESULT & SUBSCRIPTION CONVERSION -->
     <section id="viewResult" class="hidden max-w-2xl mx-auto bg-white rounded-2xl p-8 shadow-md border border-slate-200 text-center space-y-5">
       <div id="resultIcon" class="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl font-extrabold"></div>
       <h2 id="resultHeading" class="text-2xl font-extrabold text-slate-900">Exam Completed / اكتمل الاختبار</h2>
@@ -211,7 +209,21 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap justify-center gap-3 pt-2">
+      <div id="trialUpgradeBox" class="hidden bg-amber-50 border border-amber-300 rounded-2xl p-4 text-center space-y-2">
+        <p class="font-extrabold text-amber-950 ar text-sm">انتهت التجربة المجانية (5 أسئلة) — اشترك الآن لفتح جميع الموديولات (1,050 سؤال)</p>
+        <p class="text-xs font-bold text-slate-700">InstaPay / WhatsApp: <span class="font-mono text-indigo-700">01006256275</span> • Fee: <span class="text-emerald-700">300 EGP</span></p>
+        <div class="flex flex-wrap justify-center gap-2 pt-1">
+          <a id="trialWaBtn" href="https://wa.me/201006256275?text=Hello%2C%20I%20completed%20the%205-question%20free%20trial%20and%20want%20to%20subscribe%20(300%20EGP)" target="_blank"
+             class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold">
+            Subscribe via WhatsApp / اشتراك واتساب
+          </a>
+          <button onclick="app.goToSubscriptionLogin()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold">
+            Student / Admin Login / تسجيل الدخول
+          </button>
+        </div>
+      </div>
+
+      <div id="standardResultActions" class="flex flex-wrap justify-center gap-3 pt-2">
         <button onclick="app.reviewExam()" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm">
           Review Answers / مراجعة الإجابات
         </button>
@@ -225,7 +237,6 @@
     <section id="viewAdmin" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <!-- Card 1: Cloud & Local Questions Management -->
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
           <h3 class="font-extrabold text-base text-slate-900 border-b pb-2">1. Questions Source (Cloud & Local CSV)</h3>
           <div>
@@ -246,12 +257,11 @@
           </div>
         </div>
 
-        <!-- Card 2: Actual Test Settings -->
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
-          <h3 class="font-extrabold text-base text-slate-900 border-b pb-2">2. Actual Test Settings / إعدادات الامتحان الفعلي</h3>
+          <h3 class="font-extrabold text-base text-slate-900 border-b pb-2">2. Actual Test & Free Trial / الامتحان والتجربة</h3>
           <div class="grid grid-cols-3 gap-2">
             <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Questions</label>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Actual Qs</label>
               <input id="adminTestCount" type="number" min="5" max="150" value="40" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold" />
             </div>
             <div>
@@ -259,20 +269,29 @@
               <input id="adminTestMins" type="number" min="5" max="180" value="60" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold" />
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Pass %</label>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Trial Qs</label>
+              <input id="adminTrialCount" type="number" min="1" max="20" value="5" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Pass Score %</label>
               <input id="adminPassScore" type="number" min="50" max="100" value="70" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold" />
             </div>
+            <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer pt-4">
+              <input id="adminFreeTrialEnabled" type="checkbox" checked class="rounded text-emerald-600" />
+              Enable Free Trial
+            </label>
           </div>
           <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
             <input id="adminShowExpInTest" type="checkbox" class="rounded text-indigo-600" />
-            Show instant explanation during Actual Test / إظهار الشرح أثناء الامتحان
+            Show instant explanation during Actual Test
           </label>
           <button onclick="app.saveTestSettings()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-extrabold py-2.5 rounded-xl">
-            Save Test Config / حفظ إعدادات الامتحان
+            Save Test Config / حفظ الإعدادات
           </button>
         </div>
 
-        <!-- Card 3: Subscription & Admin Credentials -->
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
           <h3 class="font-extrabold text-base text-slate-900 border-b pb-2">3. Payment & Admin Security</h3>
           <div class="grid grid-cols-2 gap-2">
@@ -296,7 +315,6 @@
 
       </div>
 
-      <!-- 1000 Subscribers Management Section -->
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
           <div>
@@ -317,7 +335,6 @@
           </div>
         </div>
 
-        <!-- Search & Pagination Bar -->
         <div class="flex flex-wrap items-center justify-between gap-3">
           <input id="userSearchInput" type="text" oninput="app.renderUsersTable(1)" placeholder="Search by name or username... / بحث بالاسم أو اليوزر"
                  class="w-full sm:w-80 px-4 py-2 rounded-xl border border-slate-300 text-sm" />
@@ -328,7 +345,6 @@
           </div>
         </div>
 
-        <!-- Users Table -->
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
@@ -391,7 +407,55 @@
       { id: 7, code: "BIT 08", titleEn: "Mobile Applications & Cloud Tools V.3", titleAr: "تطبيقات الهواتف الذكية والأدوات السحابية" }
     ];
 
-    const STORAGE_KEY = "FDTC_PORTAL_V8_FINAL";
+    const SAMPLE_TRIAL_QUESTIONS = [
+      {
+        qEn: "Which component is recognized as the backbone of Information Technology and the core unit of digital processing?",
+        qAr: "أي مكون يُعرف بأنه العمود الفقري لتكنولوجيا المعلومات والوحدة الأساسية للمعالجة الرقمية؟",
+        optsEn: ["The Internet", "The Computer", "The Microprocessor", "The Operating System"],
+        optsAr: ["الإنترنت", "الحاسوب", "المعالج الدقيق", "نظام التشغيل"],
+        correct: 1,
+        expEn: "Information technology relies on the computer as its core backbone for processing and exchanging data.",
+        expAr: "تعتمد تكنولوجيا المعلومات على الحاسوب كعمود فقري أساسي لمعالجة وتبادل البيانات."
+      },
+      {
+        qEn: "RAM (Random Access Memory) is volatile memory that loses all stored data when the computer power is turned off.",
+        qAr: "ذاكرة الوصول العشوائي (RAM) هي ذاكرة متطايرة تفقد جميع بياناتها عند فصل الكهرباء عن الحاسوب.",
+        optsEn: ["True", "False"],
+        optsAr: ["صحيح", "خطأ"],
+        correct: 0,
+        expEn: "RAM is temporary working memory that clears when power is cut off.",
+        expAr: "ذاكرة RAM هي ذاكرة عمل مؤقتة يتم مسحها بمجرد انقطاع التيار الكهربائي."
+      },
+      {
+        qEn: "Which keyboard shortcut inserts a new slide into the active PowerPoint presentation?",
+        qAr: "أي اختصار لوحة مفاتيح يدرج شريحة جديدة داخل العرض التقديمي النشط في باوربوينت؟",
+        optsEn: ["Ctrl + N", "Ctrl + M", "Ctrl + S", "Alt + F4"],
+        optsAr: ["Ctrl + N", "Ctrl + M", "Ctrl + S", "Alt + F4"],
+        correct: 1,
+        expEn: "Ctrl + M inserts a new slide into the active presentation.",
+        expAr: "الاختصار Ctrl + M يدرج شريحة جديدة مباشرة داخل العرض التقديمي."
+      },
+      {
+        qEn: "What starting character MUST precede every formula and function entered into Microsoft Excel?",
+        qAr: "ما الرمز الذي يجب أن يسبق أي صيغة أو دالة يتم إدخالها في مايكروسوفت إكسل؟",
+        optsEn: ["Plus sign (+)", "Equal sign (=)", "At symbol (@)", "Hash key (#)"],
+        optsAr: ["علامة الزائد (+)", "علامة التساوي (=)", "رمز (@)", "رمز الشباك (#)"],
+        correct: 1,
+        expEn: "All formulas in Microsoft Excel must start with an equal sign (=).",
+        expAr: "يجب أن تبدأ جميع الصيغ والدوال في برنامج Excel بعلامة التساوي (=)."
+      },
+      {
+        qEn: "Two-Factor Authentication (2FA) requires two independent verification factors to grant account access.",
+        qAr: "المصادقة الثنائية (2FA) تتطلب عاملَي تحقق مستقلين لمنح الوصول إلى الحساب.",
+        optsEn: ["True", "False"],
+        optsAr: ["صحيح", "خطأ"],
+        correct: 0,
+        expEn: "2FA combines something you know with something you have or are.",
+        expAr: "تجمع المصادقة الثنائية بين عاملين مختلفين للتحقق لزيادة حماية الحساب."
+      }
+    ];
+
+    const STORAGE_KEY = "FDTC_PORTAL_V10_FETCH_FIX";
 
     function generate1000UniqueUsers() {
       const users = [];
@@ -440,7 +504,7 @@
         subFee: "300",
         payNum: "01006256275",
         cloudUrl: "",
-        testConfig: { count: 40, mins: 60, passPct: 70, showExp: false },
+        testConfig: { count: 40, mins: 60, passPct: 70, showExp: false, trialEnabled: true, trialCount: 5 },
         users: [],
         questions: { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] },
         session: null,
@@ -453,7 +517,7 @@
         if (saved) {
           try {
             const parsed = JSON.parse(saved);
-            this.state = { ...this.state, ...parsed };
+            this.state = { ...this.state, ...parsed, testConfig: { ...this.state.testConfig, ...(parsed.testConfig || {}) } };
           } catch (e) { console.error(e); }
         }
         if (!this.state.users || this.state.users.length === 0) {
@@ -461,7 +525,7 @@
           this.saveState();
         }
         this.updatePublicBranding();
-        if (this.state.session) {
+        if (this.state.session && this.state.session.role !== "guest_trial") {
           this.onLoginSuccess(this.state.session);
         }
       },
@@ -474,24 +538,28 @@
         const feeEl = document.getElementById("displaySubFee");
         const numEl = document.getElementById("displayPayNumber");
         const waEl = document.getElementById("whatsappLink");
+        const trialWaEl = document.getElementById("trialWaBtn");
+        const trialBanner = document.getElementById("freeTrialBanner");
         if (feeEl) feeEl.textContent = `${this.state.subFee} EGP / جنيه`;
         if (numEl) numEl.textContent = this.state.payNum;
-        if (waEl) {
-          const cleanPhone = this.state.payNum.replace(/^0/, "20");
-          waEl.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hello, I want to subscribe to FDTC Exam Portal (${this.state.subFee} EGP)`)}`;
-        }
+        const cleanPhone = this.state.payNum.replace(/^0/, "20");
+        const msg = encodeURIComponent(`Hello, I want to subscribe to FDTC Exam Portal (${this.state.subFee} EGP)`);
+        if (waEl) waEl.href = `https://wa.me/${cleanPhone}?text=${msg}`;
+        if (trialWaEl) trialWaEl.href = `https://wa.me/${cleanPhone}?text=${msg}`;
+        if (trialBanner) trialBanner.classList.toggle("hidden", !this.state.testConfig.trialEnabled);
       },
 
       switchLoginTab(tab) {
         const isStudent = tab === "student";
         document.getElementById("formStudentLogin").classList.toggle("hidden", !isStudent);
+        document.getElementById("freeTrialBanner").classList.toggle("hidden", !isStudent || !this.state.testConfig.trialEnabled);
         document.getElementById("formAdminLogin").classList.toggle("hidden", isStudent);
         document.getElementById("tabStudent").className = isStudent
           ? "flex-1 py-2 rounded-lg font-bold text-sm bg-indigo-600 text-white shadow"
-          : "flex-1 py-2 rounded-lg font-bold text-sm text-slate-600";
+          : "flex-1 py-2 rounded-lg font-bold text-sm text-slate-600 hover:text-slate-900";
         document.getElementById("tabAdmin").className = !isStudent
           ? "flex-1 py-2 rounded-lg font-bold text-sm bg-amber-500 text-slate-950 font-extrabold shadow"
-          : "flex-1 py-2 rounded-lg font-bold text-sm text-slate-600";
+          : "flex-1 py-2 rounded-lg font-bold text-sm text-slate-600 hover:text-slate-900";
         document.getElementById("loginErrorMsg").classList.add("hidden");
       },
 
@@ -532,13 +600,31 @@
         }
       },
 
+      startGuestTrial() {
+        if (!this.state.testConfig.trialEnabled) {
+          this.goToSubscriptionLogin();
+          return;
+        }
+        this.state.session = { role: "guest_trial", name: "Free Trial Guest", username: "trial" };
+        document.getElementById("navUserControls").classList.remove("hidden");
+        document.getElementById("currentUserBadge").textContent = "Free Trial / تجربة مجانية";
+        document.getElementById("btnAdminPanel").classList.add("hidden");
+        this.startExam(1, "trial");
+      },
+
+      goToSubscriptionLogin() {
+        this.logout();
+        this.switchLoginTab("student");
+        document.getElementById("subscriptionCard")?.scrollIntoView({ behavior: "smooth" });
+      },
+
       onLoginSuccess(session) {
         document.getElementById("navUserControls").classList.remove("hidden");
         document.getElementById("currentUserBadge").textContent = `${session.name} (${session.username})`;
         document.getElementById("btnAdminPanel").classList.toggle("hidden", session.role !== "admin");
         this.showView("dashboard");
         if (this.state.cloudUrl && this.getTotalQuestionsCount() === 0) {
-          this.syncFromCloud();
+          this.syncFromCloud(true);
         }
       },
 
@@ -575,6 +661,7 @@
       renderModules() {
         const grid = document.getElementById("modulesGrid");
         document.getElementById("totalQuestionsBadge").textContent = `Total Loaded: ${this.getTotalQuestionsCount()} Questions`;
+        const trialQCount = this.state.testConfig.trialCount || 5;
         grid.innerHTML = MODULES_META.map(m => {
           const count = (this.state.questions[m.id] || []).length;
           return `
@@ -596,6 +683,10 @@
                 <button onclick="app.startExam(${m.id}, 'actual')" class="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs sm:text-sm transition">
                   Actual Test (${this.state.testConfig.count} Q • ${this.state.testConfig.mins}m) / امتحان فعلي
                 </button>
+                ${this.state.testConfig.trialEnabled ? `
+                <button onclick="app.startExam(${m.id}, 'trial')" class="w-full py-2 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-xs transition">
+                  Free Trial (${trialQCount} Q) / تجربة مجانية
+                </button>` : ""}
               </div>
             </div>
           `;
@@ -622,11 +713,17 @@
       },
 
       startExam(moduleId, mode) {
-        const pool = (this.state.questions[moduleId] || []).map(q => this.normalizeQuestion(q));
-        if (pool.length === 0) {
+        const modMeta = MODULES_META.find(m => m.id === moduleId) || MODULES_META[0];
+        let pool = (this.state.questions[moduleId] || []).map(q => this.normalizeQuestion(q));
+
+        if (mode === "trial") {
+          const limit = this.state.testConfig.trialCount || 5;
+          pool = (pool.length >= limit ? pool : SAMPLE_TRIAL_QUESTIONS).slice(0, limit);
+        } else if (pool.length === 0) {
           alert("No questions loaded for this module yet. Admin can import FDTC_7_Modules_1050_Questions.csv or sync from Google Sheets.\nلا توجد أسئلة محملة لهذا الموديول بعد، يرجى استيراد ملف CSV من لوحة المسؤول.");
           return;
         }
+
         let selected = [...pool];
         if (mode === "actual") {
           for (let i = selected.length - 1; i > 0; i--) {
@@ -635,8 +732,8 @@
           }
           selected = selected.slice(0, Math.min(this.state.testConfig.count, selected.length));
         }
+
         if (this.state.exam && this.state.exam.timerId) clearInterval(this.state.exam.timerId);
-        const modMeta = MODULES_META.find(m => m.id === moduleId);
         this.state.exam = {
           moduleId,
           mode,
@@ -665,7 +762,10 @@
           timerBox.classList.add("hidden");
         }
 
-        document.getElementById("examModeBadge").textContent = mode === "actual" ? "Actual Test Simulation / امتحان فعلي" : "Interactive Practice / تدريب تفاعلي";
+        const badgeText = mode === "actual"
+          ? "Actual Test Simulation / امتحان فعلي"
+          : (mode === "trial" ? `Free Trial (${selected.length} Q) / تجربة مجانية` : "Interactive Practice / تدريب تفاعلي");
+        document.getElementById("examModeBadge").textContent = badgeText;
         document.getElementById("examModuleTitle").textContent = this.state.exam.title;
         this.populateJumpSelect();
         this.showView("exam");
@@ -688,7 +788,7 @@
         const ex = this.state.exam;
         const q = ex.questions[ex.currentIndex];
         const userAns = ex.answers[ex.currentIndex];
-        const showFeedback = ex.reviewMode || (ex.mode === "practice" && userAns !== null) || (ex.mode === "actual" && this.state.testConfig.showExp && userAns !== null);
+        const showFeedback = ex.reviewMode || ((ex.mode === "practice" || ex.mode === "trial") && userAns !== null) || (ex.mode === "actual" && this.state.testConfig.showExp && userAns !== null);
 
         document.getElementById("examProgressText").textContent = `${ex.currentIndex + 1} / ${ex.questions.length}`;
         document.getElementById("qNumberTag").textContent = `Question #${ex.currentIndex + 1}`;
@@ -741,9 +841,12 @@
       },
 
       nextQuestion() {
-        if (this.state.exam.currentIndex < this.state.exam.questions.length - 1) {
-          this.state.exam.currentIndex++;
+        const ex = this.state.exam;
+        if (ex.currentIndex < ex.questions.length - 1) {
+          ex.currentIndex++;
           this.renderQuestion();
+        } else if (ex.mode === "trial") {
+          this.finishExam();
         }
       },
 
@@ -766,18 +869,26 @@
         ex.questions.forEach((q, idx) => {
           if (ex.answers[idx] === q.correct) correct++;
         });
-        const total = ex.questions.length;
+        const total = ex.questions.length || 1;
         const wrong = total - correct;
         const pct = Math.round((correct / total) * 100);
         const passed = pct >= this.state.testConfig.passPct;
+        const isTrial = ex.mode === "trial";
 
-        document.getElementById("resultIcon").textContent = passed ? "🏆" : "📘";
-        document.getElementById("resultIcon").className = `w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl ${passed ? 'bg-emerald-100' : 'bg-amber-100'}`;
-        document.getElementById("resultHeading").textContent = passed ? "Congratulations! Passed / مبروك، ناجح" : "Keep Practicing / حاول مرة أخرى";
-        document.getElementById("resultSubtext").textContent = `Pass threshold: ${this.state.testConfig.passPct}% | درجة النجاح المطلوبة`;
+        document.getElementById("resultIcon").textContent = isTrial ? "🎁" : (passed ? "🏆" : "📘");
+        document.getElementById("resultIcon").className = `w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl ${isTrial ? 'bg-amber-100' : (passed ? 'bg-emerald-100' : 'bg-amber-100')}`;
+        document.getElementById("resultHeading").textContent = isTrial
+          ? "Free Trial Ended — Subscribe Now / انتهت التجربة المجانية"
+          : (passed ? "Congratulations! Passed / مبروك، ناجح" : "Keep Practicing / حاول مرة أخرى");
+        document.getElementById("resultSubtext").textContent = isTrial
+          ? `أكملت ${total} أسئلة تجريبية. للاشتراك وتفعيل 1,050 سؤال والامتحان الفعلي القيمة ${this.state.subFee} جنيه عبر InstaPay (${this.state.payNum})`
+          : `Pass threshold: ${this.state.testConfig.passPct}% | درجة النجاح المطلوبة`;
         document.getElementById("resScorePct").textContent = `${pct}%`;
         document.getElementById("resCorrectCount").textContent = correct;
         document.getElementById("resWrongCount").textContent = wrong;
+
+        document.getElementById("trialUpgradeBox").classList.toggle("hidden", !isTrial);
+        document.getElementById("standardResultActions").classList.toggle("hidden", isTrial);
         this.showView("result");
       },
 
@@ -793,6 +904,8 @@
         document.getElementById("adminCloudUrl").value = this.state.cloudUrl || "";
         document.getElementById("adminTestCount").value = this.state.testConfig.count;
         document.getElementById("adminTestMins").value = this.state.testConfig.mins;
+        document.getElementById("adminTrialCount").value = this.state.testConfig.trialCount || 5;
+        document.getElementById("adminFreeTrialEnabled").checked = this.state.testConfig.trialEnabled !== false;
         document.getElementById("adminPassScore").value = this.state.testConfig.passPct;
         document.getElementById("adminShowExpInTest").checked = !!this.state.testConfig.showExp;
         document.getElementById("adminSubFee").value = this.state.subFee;
@@ -801,41 +914,75 @@
       },
 
       saveCloudSettings() {
-        this.state.cloudUrl = document.getElementById("adminCloudUrl").value.trim();
+        const rawUrl = document.getElementById("adminCloudUrl").value.trim();
+        this.state.cloudUrl = rawUrl;
         this.saveState();
-        this.syncFromCloud();
+        this.syncFromCloud(false);
       },
 
-      async syncFromCloud() {
-        if (!this.state.cloudUrl) {
-          alert("Please enter the Google Apps Script /exec URL first.");
+      applyQuestionsList(list) {
+        const grouped = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
+        list.forEach(item => {
+          const m = Number(item.module) || 1;
+          if (grouped[m]) {
+            const rawCorrect = Number(item.correct);
+            const idxCorrect = rawCorrect >= 1 && rawCorrect <= 4 ? rawCorrect - 1 : (Number(item.correct) || 0);
+            grouped[m].push({
+              qAr: item.qAr || item.qEn || "",
+              qEn: item.qEn || item.qAr || "",
+              opt1Ar: item.opt1Ar || "", opt2Ar: item.opt2Ar || "", opt3Ar: item.opt3Ar || "", opt4Ar: item.opt4Ar || "",
+              opt1En: item.opt1En || "", opt2En: item.opt2En || "", opt3En: item.opt3En || "", opt4En: item.opt4En || "",
+              correct: Math.max(0, idxCorrect),
+              expAr: item.expAr || "", expEn: item.expEn || ""
+            });
+          }
+        });
+        this.state.questions = grouped;
+        this.saveState();
+        this.renderModules();
+      },
+
+      async syncFromCloud(silent = false) {
+        const url = (this.state.cloudUrl || "").trim();
+        if (!url) {
+          if (!silent) alert("أدخل رابط Google Apps Script (/exec) أولاً أو استورد ملف CSV محلياً.\nEnter the Google Apps Script /exec URL first or import local CSV.");
           return;
         }
+        const btn = document.getElementById("btnSyncCloud");
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+
         try {
-          const res = await fetch(this.state.cloudUrl);
-          const data = await res.json();
+          if (btn) { btn.disabled = true; btn.textContent = "Syncing..."; }
+          const res = await fetch(url, { method: "GET", redirect: "follow", signal: controller.signal });
+          clearTimeout(timeoutId);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const text = await res.text();
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (_) {
+            throw new Error("الرابط لا يُرجع JSON سليم (تأكد من ضبط Who has access على Anyone ونشر إصدار جديد /exec)");
+          }
           const list = Array.isArray(data) ? data : (data.questions || []);
-          if (!list.length) throw new Error("Empty sheet data");
-          const grouped = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
-          list.forEach(item => {
-            const m = Number(item.module) || 1;
-            if (grouped[m]) {
-              grouped[m].push({
-                qAr: item.qAr || item.qEn || "",
-                qEn: item.qEn || item.qAr || "",
-                opt1Ar: item.opt1Ar || "", opt2Ar: item.opt2Ar || "", opt3Ar: item.opt3Ar || "", opt4Ar: item.opt4Ar || "",
-                opt1En: item.opt1En || "", opt2En: item.opt2En || "", opt3En: item.opt3En || "", opt4En: item.opt4En || "",
-                correct: Math.max(0, (Number(item.correct) || 1) - 1),
-                expAr: item.expAr || "", expEn: item.expEn || ""
-              });
-            }
-          });
-          this.state.questions = grouped;
-          this.saveState();
-          this.renderModules();
-          alert(`Synced ${list.length} questions successfully from Google Sheets!`);
+          if (!Array.isArray(list) || list.length === 0) {
+            throw new Error("جدول البيانات فارغ أو لا يحتوي على صفوف أسئلة");
+          }
+          this.applyQuestionsList(list);
+          if (!silent) alert(`تمت مزامنة ${list.length} سؤالاً بنجاح من Google Sheets!`);
         } catch (err) {
-          alert("Sync error: " + err.message);
+          clearTimeout(timeoutId);
+          const isFileProto = window.location.protocol === "file:";
+          const reason = err.name === "AbortError"
+            ? "انتهت مهلة الاتصال (Timeout)"
+            : (isFileProto && err.message.includes("Failed to fetch")
+                ? "Failed to fetch: الصفحة مفتوحة عبر file:// أو صلاحيات Google تحتاج ضبط Anyone"
+                : err.message);
+          if (!silent) {
+            alert(`Sync error: ${reason}\nيمكنك استخدام الاستيراد المحلي لملف CSV فوراً من لوحة المسؤول.`);
+          }
+        } finally {
+          if (btn) { btn.disabled = false; btn.textContent = "Sync Cloud / تحديث الأسئلة"; }
         }
       },
 
@@ -844,34 +991,29 @@
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
-          const text = ev.target.result.replace(/^\uFEFF/, "");
-          if (file.name.endsWith(".json")) {
-            const parsed = JSON.parse(text);
-            this.state.questions = parsed;
-          } else {
-            const rows = parseCSVLine(text);
-            const headers = rows[0].map(h => h.trim());
-            const grouped = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
-            for (let i = 1; i < rows.length; i++) {
-              if (rows[i].length < 5) continue;
-              const obj = {};
-              headers.forEach((h, idx) => obj[h] = (rows[i][idx] || "").trim());
-              const m = Number(obj.module) || 1;
-              if (grouped[m]) {
-                grouped[m].push({
-                  qAr: obj.qAr, qEn: obj.qEn,
-                  opt1Ar: obj.opt1Ar, opt2Ar: obj.opt2Ar, opt3Ar: obj.opt3Ar, opt4Ar: obj.opt4Ar,
-                  opt1En: obj.opt1En, opt2En: obj.opt2En, opt3En: obj.opt3En, opt4En: obj.opt4En,
-                  correct: Math.max(0, (Number(obj.correct) || 1) - 1),
-                  expAr: obj.expAr, expEn: obj.expEn
-                });
+          try {
+            const text = ev.target.result.replace(/^\uFEFF/, "");
+            if (file.name.toLowerCase().endsWith(".json")) {
+              const parsed = JSON.parse(text);
+              this.state.questions = parsed;
+            } else {
+              const rows = parseCSVLine(text);
+              const headers = rows[0].map(h => h.trim());
+              const list = [];
+              for (let i = 1; i < rows.length; i++) {
+                if (rows[i].length < 5) continue;
+                const obj = {};
+                headers.forEach((h, idx) => obj[h] = (rows[i][idx] || "").trim());
+                list.push(obj);
               }
+              this.applyQuestionsList(list);
             }
-            this.state.questions = grouped;
+            this.saveState();
+            this.renderModules();
+            alert(`Imported ${this.getTotalQuestionsCount()} questions successfully! / تم استيراد الأسئلة بنجاح`);
+          } catch (err) {
+            alert("Import error / خطأ في قراءة الملف: " + err.message);
           }
-          this.saveState();
-          this.renderModules();
-          alert(`Imported ${this.getTotalQuestionsCount()} questions successfully! / تم استيراد الأسئلة بنجاح`);
         };
         reader.readAsText(file, "UTF-8");
       },
@@ -898,11 +1040,14 @@
         this.state.testConfig = {
           count: Math.max(5, Number(document.getElementById("adminTestCount").value) || 40),
           mins: Math.max(5, Number(document.getElementById("adminTestMins").value) || 60),
+          trialCount: Math.max(1, Number(document.getElementById("adminTrialCount").value) || 5),
+          trialEnabled: document.getElementById("adminFreeTrialEnabled").checked,
           passPct: Math.min(100, Math.max(50, Number(document.getElementById("adminPassScore").value) || 70)),
           showExp: document.getElementById("adminShowExpInTest").checked
         };
         this.saveState();
-        alert("Actual Test settings saved! / تم حفظ إعدادات الامتحان الفعلي");
+        this.updatePublicBranding();
+        alert("Actual Test & Free Trial settings saved! / تم حفظ الإعدادات بنجاح");
       },
 
       saveAdminGeneral() {
@@ -914,7 +1059,6 @@
         alert("General & payment settings updated! / تم تحديث الإعدادات بنجاح");
       },
 
-      // USERS CRUD & CSV
       getFilteredUsers() {
         const term = (document.getElementById("userSearchInput")?.value || "").toLowerCase().trim();
         return this.state.users
